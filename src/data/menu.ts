@@ -142,4 +142,23 @@ export const menuItems: FoodItem[] = [
     category: "Drikke",
     image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=300&fit=crop",
   },
+
+  {
+    id: "17",
+    name: "Pulled Pork Tacos",
+    description: "Tre myke tacos med langtidsstekt svinekjøtt, coleslaw, chipotle-aioli og syltet rødløk",
+    price: 159,
+    category: "Hovedretter",
+    image: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=300&fit=crop",
+    badge: "Ny",
+  },
+  {
+    id: "18",
+    name: "Edamame",
+    description: "Dampede soyabønner med havsalt og sesamolje — en lett og sunn snack",
+    price: 69,
+    category: "Småretter",
+    image: "https://images.unsplash.com/photo-1564834724105-918b73d1b8e0?w=400&h=300&fit=crop",
+    badge: "Ny",
+  },
 ];
