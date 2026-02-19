@@ -19,7 +19,7 @@ export const menuItems: FoodItem[] = [
     description: "Sprøstekte vinger med buffalo-saus og ranch-dip",
     price: 119,
     category: "Småretter",
-    image: "https://images.unsplash.com/photo-1608039829572-9b0188e45353?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=400&h=300&fit=crop",
   },
   {
     id: "3",

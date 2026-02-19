@@ -30,7 +30,7 @@ insert into public.menu_items (name, description, price, category, image, badge)
 values
   -- Småretter
   ('Bruschetta', 'Ristet surdeigsbrød med tomater, basilikum, hvitløk og ekstra virgin olivenolje', 89, 'Småretter', 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400&h=300&fit=crop', 'Populær'),
-  ('Kyllingvinger', 'Sprøstekte vinger med buffalo-saus og ranch-dip', 119, 'Småretter', 'https://images.unsplash.com/photo-1608039829572-9b0188e45353?w=400&h=300&fit=crop', null),
+  ('Kyllingvinger', 'Sprøstekte vinger med buffalo-saus og ranch-dip', 119, 'Småretter', 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=400&h=300&fit=crop', null),
   ('Nachos Supreme', 'Sprø tortillachips med smeltet ost, guacamole, salsa og rømme', 109, 'Småretter', 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400&h=300&fit=crop', null),
   ('Hvitløksreker', 'Scampi stekt i smør med hvitløk, chili og frisk persille', 139, 'Småretter', 'https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?w=400&h=300&fit=crop', null),
   -- Salater

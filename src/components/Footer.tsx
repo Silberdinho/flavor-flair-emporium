@@ -1,16 +1,24 @@
 import { Leaf } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const scrollToElement = (id: string) => {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-};
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleNavigate = (path: string, scrollTo?: string) => {
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (scrollTo) {
+      setTimeout(() => {
+        document.getElementById(scrollTo)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  };
+
   return (
     <footer id="kontakt" className="bg-foreground text-primary-foreground py-12">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+          <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center gap-2 mb-4">
               <Leaf className="h-6 w-6" />
               <span className="font-display text-xl font-bold">FreshBite</span>
@@ -19,8 +27,8 @@ const Footer = () => {
               Fersk mat laget med kjærlighet. Vi bruker kun lokale råvarer av høyeste kvalitet.
             </p>
             <div className="flex gap-4 mt-4">
-              <button onClick={() => scrollToElement("meny")} className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors bg-transparent border-none cursor-pointer">Meny</button>
-              <Link to="/om-oss" className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors">Om oss</Link>
+              <button onClick={() => handleNavigate("/", "meny")} className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors bg-transparent border-none cursor-pointer">Meny</button>
+              <button onClick={() => handleNavigate("/om-oss")} className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors bg-transparent border-none cursor-pointer">Om oss</button>
             </div>
           </div>
 
