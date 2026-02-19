@@ -3,10 +3,10 @@ import HeroSection from "@/components/HeroSection";
 import MenuSection from "@/components/MenuSection";
 import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
-import { useCart } from "@/hooks/useCart";
+import { useCartContext } from "@/context/CartContext";
 
 const Index = () => {
-  const { items, addItem, removeItem, clearCart, totalItems, totalPrice, isOpen, setIsOpen } = useCart();
+  const { items, addItem, removeItem, clearCart, totalItems, totalPrice, isOpen, setIsOpen } = useCartContext();
 
   return (
     <div className="min-h-screen bg-background">

@@ -13,6 +13,10 @@ const Footer = () => {
             <p className="text-primary-foreground/70 text-sm">
               Fersk mat laget med kjærlighet. Vi bruker kun lokale råvarer av høyeste kvalitet.
             </p>
+            <div className="flex gap-4 mt-4">
+              <a href="/#meny" className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors">Meny</a>
+              <a href="/om-oss" className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors">Om oss</a>
+            </div>
           </div>
 
           <div>

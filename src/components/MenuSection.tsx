@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FoodCard from "./FoodCard";
-import { categories, menuItems } from "@/data/menu";
+import { menuItems as fallbackMenuItems } from "@/data/menu";
 import { FoodItem } from "@/types/food";
+import { getMenuItems } from "@/services/menuService";
 
 interface MenuSectionProps {
   onAddToCart: (item: FoodItem) => void;
@@ -9,6 +10,21 @@ interface MenuSectionProps {
 
 const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
   const [activeCategory, setActiveCategory] = useState("Alle");
+  const [menuItems, setMenuItems] = useState<FoodItem[]>(fallbackMenuItems);
+
+  useEffect(() => {
+    const loadMenu = async () => {
+      const fetchedItems = await getMenuItems();
+      setMenuItems(fetchedItems);
+    };
+
+    void loadMenu();
+  }, []);
+
+  const categories = useMemo(
+    () => ["Alle", ...Array.from(new Set(menuItems.map((item) => item.category)))],
+    [menuItems],
+  );
 
   const filtered =
     activeCategory === "Alle"

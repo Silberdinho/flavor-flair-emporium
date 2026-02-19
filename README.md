@@ -1,73 +1,302 @@
-# Welcome to your Lovable project
+# FreshBite — Fersk mat, levert til deg
 
-## Project info
+En fullstack restaurant-nettside med online bestilling, kortbetaling og e-postbekreftelser.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## Innholdsfortegnelse
 
-There are several ways of editing your application.
+- [Teknologier](#teknologier)
+- [Arkitektur](#arkitektur)
+- [Kom i gang](#kom-i-gang)
+- [Miljøvariabler](#miljøvariabler)
+- [Database (Supabase)](#database-supabase)
+- [Betaling (Stripe)](#betaling-stripe)
+- [E-post (Resend)](#e-post-resend)
+- [Edge Functions](#edge-functions)
+- [Testkort](#testkort)
+- [Prosjektstruktur](#prosjektstruktur)
+- [Kommandoer](#kommandoer)
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Teknologier
 
-Changes made via Lovable will be committed automatically to this repo.
+| Lag | Teknologi |
+|---|---|
+| Frontend | React 18, TypeScript, Vite |
+| Styling | Tailwind CSS, shadcn/ui |
+| Database | Supabase (PostgreSQL) |
+| Betaling | Stripe (Elements + PaymentIntents) |
+| E-post | Resend |
+| Serverless | Supabase Edge Functions (Deno) |
+| Routing | React Router DOM |
+| Testing | Vitest |
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Arkitektur
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```
+Bruker (nettleser)
+  │
+  ├── React-app (Vite)
+  │     ├── /             → Forside med meny og handlekurv
+  │     ├── /om-oss       → Om oss-side
+  │     ├── /bekreftelse  → Ordrebekreftelse etter kjøp
+  │     └── /*            → 404-side (norsk)
+  │
+  ├── Supabase (Database)
+  │     ├── menu_items     → Menydata (rett, pris, kategori, bilde)
+  │     ├── orders         → Bestillinger med kontaktinfo og betalingsstatus
+  │     └── order_items    → Linjer per bestilling
+  │
+  ├── Supabase Edge Functions
+  │     ├── create-payment-intent  → Oppretter Stripe PaymentIntent
+  │     └── send-order-email       → Sender ordrebekreftelse via Resend
+  │
+  └── Eksterne API-er
+        ├── Stripe API     → Kortbetaling
+        └── Resend API     → Transaksjonelle e-poster
+```
 
-Follow these steps:
+---
+
+## Kom i gang
+
+### Forutsetninger
+
+- Node.js ≥ 18 og npm
+- En [Supabase](https://supabase.com)-konto (gratis)
+- En [Stripe](https://stripe.com)-konto (gratis testmodus)
+- (Valgfritt) En [Resend](https://resend.com)-konto for e-postbekreftelser
+
+### Installasjon
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# 1. Klon repoet
+git clone <ditt-repo-url>
+cd flavor-flair-emporium
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Installer avhengigheter
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Konfigurer miljøvariabler
+cp .env.example .env.local
+# Fyll inn nøklene (se "Miljøvariabler" under)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Kjør databaseskriptet i Supabase SQL Editor
+#    Kopier innholdet fra supabase/schema.sql og kjør det
+
+# 5. Start utviklingsserveren
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Appen åpnes på `http://localhost:8080`.  
+Hvis Supabase ikke er konfigurert, brukes automatisk lokal fallback-data for menyen.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Miljøvariabler
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Opprett `.env.local` i prosjektroten (aldri commit denne):
 
-## What technologies are used for this project?
+```env
+# Supabase — Hentes fra supabase.com/dashboard → Settings → API
+VITE_SUPABASE_URL=https://<prosjekt-id>.supabase.co
+VITE_SUPABASE_ANON_KEY=<din-anon-key>
 
-This project is built with:
+# Stripe — Hentes fra dashboard.stripe.com/test/apikeys
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+> **Merk:** Hemmelige nøkler (Stripe secret key, Resend API key) lagres **ikke** i `.env.local`. De settes som Supabase Edge Function-secrets (se under).
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Database (Supabase)
 
-## Can I connect a custom domain to my Lovable project?
+Prosjektet bruker Supabase sitt **gratisnivå** (500 MB database, 50 000 requests/mnd).
 
-Yes, you can!
+### Tabeller
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+| Tabell | Beskrivelse |
+|---|---|
+| `menu_items` | Matretter med navn, beskrivelse, pris, kategori og bilde-URL |
+| `orders` | Bestillinger med kontaktinfo (navn, e-post, telefon, adresse), betalingsstatus og total |
+| `order_items` | Enkeltlinjer i en bestilling (vare, antall, pris) |
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Oppsett
+
+1. Gå til [Supabase Dashboard](https://supabase.com/dashboard) → SQL Editor
+2. Lim inn og kjør innholdet fra `supabase/schema.sql`
+3. Skriptet oppretter tabellene, seed-data for menyen, og RLS-policyer
+
+### RLS-policyer (Row Level Security)
+
+- `menu_items` — lesbar for alle (public SELECT)
+- `orders` — skriving tillatt for alle (public INSERT)
+- `order_items` — skriving tillatt for alle (public INSERT)
+
+---
+
+## Betaling (Stripe)
+
+Stripe brukes i **testmodus** — ingen ekte penger belastes.
+
+### Flyt
+
+1. Bruker legger varer i handlekurven
+2. Fyller ut kontaktinfo (navn, e-post, telefon, adresse)
+3. Stripe Elements-kortfelt vises
+4. Frontend kaller Edge Function `create-payment-intent`
+5. Edge Function oppretter en `PaymentIntent` via Stripe API
+6. Frontend bekrefter betalingen med `confirmCardPayment`
+7. Ordre lagres i Supabase med betalingsreferanse
+8. Bruker sendes til bekreftelsessiden
+
+### Nøkler
+
+| Nøkkel | Hvor | Formål |
+|---|---|---|
+| `pk_test_...` | `.env.local` (`VITE_STRIPE_PUBLISHABLE_KEY`) | Frontendens Stripe Elements |
+| `sk_test_...` | Supabase Edge Function secret (`STRIPE_SECRET_KEY`) | ServerSide PaymentIntent-opprettelse |
+
+### Fallback
+
+Hvis Stripe-nøkkelen ikke er satt i `.env.local`, viser appen en **simulert testbetaling** i stedet. Bestillinger lagres uansett, men med `payment_method: "simulated"`.
+
+---
+
+## E-post (Resend)
+
+Ordrebekreftelser sendes via [Resend](https://resend.com) og er **valgfritt**.
+
+- Avsender: `FreshBite <onboarding@resend.dev>` (Resends standard-avsender)
+- Gratisnivå: 3 000 e-poster/mnd, men kun til **din registrerte e-postadresse** med standard-avsender
+- For å sende til alle kunder: Legg til og verifiser et eget domene i Resend-dashbordet
+
+### Nøkkel
+
+| Nøkkel | Hvor |
+|---|---|
+| `re_...` | Supabase Edge Function secret (`RESEND_API_KEY`) |
+
+Hvis `RESEND_API_KEY` ikke er satt, hopper appen over e-postsending uten feil.
+
+---
+
+## Edge Functions
+
+To Supabase Edge Functions kjører server-side logikk:
+
+### `create-payment-intent`
+
+- **Formål:** Oppretter en Stripe PaymentIntent server-side
+- **Fil:** `supabase/functions/create-payment-intent/index.ts`
+- **Secrets:** `STRIPE_SECRET_KEY`
+- **Endepunkt:** `POST <supabase-url>/functions/v1/create-payment-intent`
+
+### `send-order-email`
+
+- **Formål:** Sender ordrebekreftelse via Resend
+- **Fil:** `supabase/functions/send-order-email/index.ts`
+- **Secrets:** `RESEND_API_KEY`
+- **Endepunkt:** `POST <supabase-url>/functions/v1/send-order-email`
+
+### Deploy Edge Functions
+
+```sh
+# Sett access-token (hentes fra supabase.com/dashboard/account/tokens)
+$env:SUPABASE_ACCESS_TOKEN = "sbp_..."
+
+# Link prosjektet
+npx supabase link --project-ref <prosjekt-id>
+
+# Sett hemmeligheter
+npx supabase secrets set STRIPE_SECRET_KEY=sk_test_...
+npx supabase secrets set RESEND_API_KEY=re_...
+
+# Deploy
+npx supabase functions deploy create-payment-intent --no-verify-jwt
+npx supabase functions deploy send-order-email --no-verify-jwt
+```
+
+---
+
+## Testkort
+
+For å teste betaling i Stripe sin testmodus:
+
+| Kortnummer | Utløpsdato | CVC | Resultat |
+|---|---|---|---|
+| `4242 4242 4242 4242` | Vilkårlig fremtidig | `123` | Vellykket betaling |
+| `4000 0000 0000 0002` | Vilkårlig fremtidig | `123` | Avvist kort |
+| `4000 0025 0000 3155` | Vilkårlig fremtidig | `123` | Krever 3D Secure |
+
+---
+
+## Prosjektstruktur
+
+```
+├── public/                  # Statiske filer
+├── src/
+│   ├── components/          # React-komponenter
+│   │   ├── ui/              # shadcn/ui-komponenter
+│   │   ├── CartDrawer.tsx   # Handlekurv + checkout-flyt
+│   │   ├── FoodCard.tsx     # Matrett-kort
+│   │   ├── Footer.tsx       # Bunntekst med navigasjon
+│   │   ├── HeroSection.tsx  # Hero-banner
+│   │   ├── MenuSection.tsx  # Menyvisning med kategorifilter
+│   │   ├── Navbar.tsx       # Navigasjonsbar (responsiv)
+│   │   ├── NavLink.tsx      # Navigasjonslenke
+│   │   └── StripeCardPayment.tsx  # Stripe Elements-kortfelt
+│   ├── context/
+│   │   └── CartContext.tsx   # Delt handlekurv-tilstand
+│   ├── data/
+│   │   └── menu.ts          # Lokal fallback-menydata
+│   ├── hooks/
+│   │   └── useCart.ts        # Handlekurv-logikk
+│   ├── lib/
+│   │   ├── supabase.ts      # Supabase-klient
+│   │   └── utils.ts         # Hjelpefunksjoner
+│   ├── pages/
+│   │   ├── Index.tsx         # Forside
+│   │   ├── About.tsx         # Om oss
+│   │   ├── OrderConfirmation.tsx  # Ordrebekreftelse
+│   │   └── NotFound.tsx      # 404-side (norsk)
+│   ├── services/
+│   │   ├── menuService.ts    # Hent meny fra Supabase/fallback
+│   │   ├── orderService.ts   # Lagre bestillinger
+│   │   ├── stripeService.ts  # Stripe-integrasjon
+│   │   └── emailService.ts   # E-postbekreftelse
+│   ├── types/
+│   │   ├── food.ts           # FoodItem / CartItem
+│   │   └── order.ts          # CheckoutContactInfo
+│   ├── App.tsx               # Routing + CartProvider
+│   └── main.tsx              # Inngangspunkt
+├── supabase/
+│   ├── schema.sql            # Database-skjema + seed-data
+│   └── functions/
+│       ├── create-payment-intent/index.ts
+│       └── send-order-email/index.ts
+├── .env.example              # Mal for miljøvariabler
+├── .env.local                # Faktiske nøkler (ikke i git)
+├── package.json
+├── tailwind.config.ts
+├── vite.config.ts
+└── vitest.config.ts
+```
+
+---
+
+## Kommandoer
+
+| Kommando | Beskrivelse |
+|---|---|
+| `npm run dev` | Start utviklingsserver |
+| `npm run build` | Bygg for produksjon |
+| `npm run preview` | Forhåndsvis produksjonsbygg |
+| `npm run test` | Kjør tester (Vitest) |
+| `npm run test:watch` | Kjør tester i watch-modus |
+| `npm run lint` | Kjør ESLint |
