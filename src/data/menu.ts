@@ -11,7 +11,6 @@ export const menuItems: FoodItem[] = [
     price: 89,
     category: "Småretter",
     image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400&h=300&fit=crop",
-    badge: "Populær",
   },
   {
     id: "2",
@@ -28,6 +27,7 @@ export const menuItems: FoodItem[] = [
     price: 109,
     category: "Småretter",
     image: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400&h=300&fit=crop",
+    badge: "Populær",
   },
   {
     id: "4",
@@ -54,7 +54,6 @@ export const menuItems: FoodItem[] = [
     price: 149,
     category: "Salater",
     image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400&h=300&fit=crop",
-    badge: "Anbefalt",
   },
   {
     id: "7",
@@ -73,7 +72,6 @@ export const menuItems: FoodItem[] = [
     price: 269,
     category: "Hovedretter",
     image: "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=400&h=300&fit=crop",
-    badge: "Anbefalt",
   },
   {
     id: "9",
@@ -91,6 +89,7 @@ export const menuItems: FoodItem[] = [
     price: 179,
     category: "Hovedretter",
     image: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&h=300&fit=crop",
+    badge: "Populær",
   },
   {
     id: "11",
@@ -150,7 +149,6 @@ export const menuItems: FoodItem[] = [
     price: 159,
     category: "Hovedretter",
     image: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=300&fit=crop",
-    badge: "Ny",
   },
   {
     id: "18",
@@ -159,6 +157,5 @@ export const menuItems: FoodItem[] = [
     price: 69,
     category: "Småretter",
     image: "https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?w=400&h=300&fit=crop",
-    badge: "Ny",
   },
 ];

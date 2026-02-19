@@ -37,10 +37,17 @@ const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
     [menuItems],
   );
 
-  const filtered =
-    activeCategory === "Alle"
-      ? menuItems
-      : menuItems.filter((i) => i.category === activeCategory);
+  const filtered = useMemo(() => {
+    const base =
+      activeCategory === "Alle"
+        ? menuItems
+        : menuItems.filter((i) => i.category === activeCategory);
+    return [...base].sort((a, b) => {
+      const aPopular = a.badge === "Populær" ? 0 : 1;
+      const bPopular = b.badge === "Populær" ? 0 : 1;
+      return aPopular - bPopular;
+    });
+  }, [menuItems, activeCategory]);
 
   return (
     <section id="meny" className="py-16 md:py-24">
