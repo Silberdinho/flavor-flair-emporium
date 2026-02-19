@@ -31,21 +31,21 @@ export const menuItems: FoodItem[] = [
   },
   {
     id: "4",
-    name: "Hvitløksreker",
-    description: "Scampi stekt i smør med hvitløk, chili og frisk persille",
-    price: 139,
+    name: "Sprøbakte Vårruller",
+    description: "Crispy vårruller fylt med grønnsaker og glassnudler, servert med søt chilisaus",
+    price: 99,
     category: "Småretter",
-    image: "https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1548507200-e9e0e7e0b8e8?w=400&h=300&fit=crop",
   },
 
   // ── Salater ──
   {
     id: "5",
-    name: "Gresk Salat",
-    description: "Friske tomater, agurk, oliven, fetaost og rødløk med oregano-vinaigrette",
-    price: 139,
+    name: "Caprese Salat",
+    description: "Fersk mozzarella, modne tomater og basilikum med balsamicoglaze og olivenolje",
+    price: 129,
     category: "Salater",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1592417817098-8fd3d9eb14a5?w=400&h=300&fit=crop",
   },
   {
     id: "6",
@@ -57,21 +57,21 @@ export const menuItems: FoodItem[] = [
   },
   {
     id: "7",
-    name: "Thai Biff-salat",
-    description: "Grillet biff med mango, koriander, peanøtter og søt chilidressing",
+    name: "Poke Bowl",
+    description: "Marinert laks på sushiris med avokado, edamame, mango og sesamdressing",
     price: 169,
     category: "Salater",
-    image: "https://images.unsplash.com/photo-1607532941433-304659e8198a?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop",
   },
 
   // ── Hovedretter ──
   {
     id: "8",
-    name: "Grillet Laks",
-    description: "Norsk laks med sitronsmør, dampede grønnsaker og kremet potetpuré",
-    price: 269,
+    name: "Pizza Margherita",
+    description: "Steinovnsbakt pizza med San Marzano-tomater, fersk mozzarella og basilikum",
+    price: 179,
     category: "Hovedretter",
-    image: "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop",
   },
   {
     id: "9",
