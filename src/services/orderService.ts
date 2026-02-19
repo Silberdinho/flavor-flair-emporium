@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { CartItem } from "@/types/food";
 import { CheckoutContactInfo } from "@/types/order";
+import { sanitizeText, sanitizeEmail, sanitizePhone } from "@/lib/sanitize";
 
 const uuidRegex =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -41,13 +42,13 @@ export const createOrder = async (
   const orderId = createUuid();
 
   const normalizedContact = {
-    fullName: contactInfo.fullName.trim(),
-    email: contactInfo.email.trim().toLowerCase(),
-    phone: contactInfo.phone.trim(),
-    address: contactInfo.address.trim(),
-    postalCode: contactInfo.postalCode.trim(),
-    city: contactInfo.city.trim(),
-    comment: contactInfo.comment?.trim() || null,
+    fullName: sanitizeText(contactInfo.fullName, 100),
+    email: sanitizeEmail(contactInfo.email),
+    phone: sanitizePhone(contactInfo.phone),
+    address: sanitizeText(contactInfo.address, 200),
+    postalCode: sanitizeText(contactInfo.postalCode, 10),
+    city: sanitizeText(contactInfo.city, 100),
+    comment: contactInfo.comment ? sanitizeText(contactInfo.comment, 500) : null,
   };
 
   const { error: orderError } = await supabase

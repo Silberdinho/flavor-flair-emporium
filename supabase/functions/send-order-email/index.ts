@@ -9,9 +9,41 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Simple in-memory rate limiter (per Edge Function instance)
+const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 5; // max 5 emails per minute per IP
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = (rateLimitMap.get(ip) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (timestamps.length >= RATE_LIMIT_MAX) return true;
+  timestamps.push(now);
+  rateLimitMap.set(ip, timestamps);
+  return false;
+}
+
+// Escape HTML to prevent XSS in email body
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+
+  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (isRateLimited(clientIp)) {
+    return new Response(
+      JSON.stringify({ error: "For mange forespørsler. Prøv igjen om litt." }),
+      { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 
   try {
@@ -31,15 +63,19 @@ serve(async (req) => {
 
     const itemRows = (items ?? [])
       .map((item: { name: string; quantity: number; price: number }) =>
-        `<tr><td style="padding:6px 12px">${item.quantity}x ${item.name}</td><td style="padding:6px 12px;text-align:right">${item.price * item.quantity} kr</td></tr>`,
+        `<tr><td style="padding:6px 12px">${Number(item.quantity)}x ${escapeHtml(String(item.name))}</td><td style="padding:6px 12px;text-align:right">${Number(item.price) * Number(item.quantity)} kr</td></tr>`,
       )
       .join("");
 
+    const safeName = escapeHtml(String(customerName));
+    const safeOrderId = escapeHtml(String(orderId).slice(0, 8).toUpperCase());
+    const safeTotal = Number(totalPrice);
+
     const html = `
       <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-        <h2 style="color:#16a34a">Takk for bestillingen, ${customerName}!</h2>
+        <h2 style="color:#16a34a">Takk for bestillingen, ${safeName}!</h2>
         <p>Vi har mottatt bestillingen din og jobber med den nå.</p>
-        <p><strong>Ordrenummer:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
+        <p><strong>Ordrenummer:</strong> ${safeOrderId}</p>
         <table style="width:100%;border-collapse:collapse;margin:16px 0">
           <thead><tr style="border-bottom:1px solid #e5e7eb">
             <th style="text-align:left;padding:6px 12px">Vare</th>
@@ -48,7 +84,7 @@ serve(async (req) => {
           <tbody>${itemRows}</tbody>
           <tfoot><tr style="border-top:2px solid #16a34a">
             <td style="padding:8px 12px;font-weight:bold">Totalt</td>
-            <td style="padding:8px 12px;text-align:right;font-weight:bold">${totalPrice} kr</td>
+            <td style="padding:8px 12px;text-align:right;font-weight:bold">${safeTotal} kr</td>
           </tr></tfoot>
         </table>
         <p style="color:#6b7280;font-size:14px">Hilsen FreshBite-teamet</p>

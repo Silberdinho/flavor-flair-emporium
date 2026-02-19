@@ -123,6 +123,28 @@ alter table public.orders add column if not exists payment_status text;
 alter table public.orders add column if not exists payment_method text;
 alter table public.orders add column if not exists payment_reference text;
 
+-- Max-length constraints for security (prevents oversized payloads)
+do $$ begin
+  alter table public.orders add constraint chk_customer_name_length check (length(customer_name) <= 100);
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_email_length check (length(customer_email) <= 254);
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_phone_length check (length(customer_phone) <= 20);
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_address_length check (length(customer_address) <= 200);
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_comment_length check (length(customer_comment) <= 500);
+exception when duplicate_object then null;
+end $$;
+
 create table if not exists public.order_items (
   id bigserial primary key,
   order_id uuid not null references public.orders(id) on delete cascade,
