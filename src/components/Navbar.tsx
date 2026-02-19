@@ -45,7 +45,11 @@ const Navbar = ({ cartCount, onCartClick }: NavbarProps) => {
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto flex items-center justify-between py-4 px-4">
-        <Link to="/" className="flex items-center gap-2">
+        <Link
+          to="/"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="flex items-center gap-2"
+        >
           <Leaf className="h-7 w-7 text-primary" />
           <span className="font-display text-2xl font-bold text-foreground">
             FreshBite
