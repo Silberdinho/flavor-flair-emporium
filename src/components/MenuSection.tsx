@@ -11,13 +11,24 @@ interface MenuSectionProps {
 const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
   const [activeCategory, setActiveCategory] = useState("Alle");
   const [menuItems, setMenuItems] = useState<FoodItem[]>(fallbackMenuItems);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadMenu = async () => {
+  const loadMenu = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
       const fetchedItems = await getMenuItems();
       setMenuItems(fetchedItems);
-    };
+    } catch {
+      setError("Kunne ikke laste menyen. Viser hurtigmeny i mellomtiden.");
+      setMenuItems(fallbackMenuItems);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     void loadMenu();
   }, []);
 
@@ -59,8 +70,34 @@ const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((item, i) => (
+        {error && (
+          <div className="text-center mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg max-w-md mx-auto">
+            <p className="text-sm text-destructive mb-2">{error}</p>
+            <button
+              onClick={() => void loadMenu()}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Prøv igjen
+            </button>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-card rounded-lg border border-border overflow-hidden animate-pulse">
+                <div className="h-48 bg-muted" />
+                <div className="p-4 space-y-3">
+                  <div className="h-5 bg-muted rounded w-2/3" />
+                  <div className="h-4 bg-muted rounded w-full" />
+                  <div className="h-10 bg-muted rounded w-full mt-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((item, i) => (
             <div
               key={item.id}
               className="animate-fade-in-up h-full"
@@ -70,6 +107,7 @@ const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
             </div>
           ))}
         </div>
+        )}
       </div>
     </section>
   );

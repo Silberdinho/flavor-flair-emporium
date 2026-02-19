@@ -12,13 +12,6 @@ import { isStripeConfigured } from "@/services/stripeService";
 import StripeCardPayment from "@/components/StripeCardPayment";
 import { CheckoutContactInfo } from "@/types/order";
 
-interface CheckoutPaymentInfo {
-  cardholderName: string;
-  cardNumber: string;
-  expiry: string;
-  cvc: string;
-}
-
 interface CartDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -40,7 +33,6 @@ const CartDrawer = ({
 }: CartDrawerProps) => {
   const navigate = useNavigate();
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
   const [paymentReference, setPaymentReference] = useState<string | null>(null);
   const [contactInfo, setContactInfo] = useState<CheckoutContactInfo>({
@@ -52,19 +44,9 @@ const CartDrawer = ({
     city: "",
     comment: "",
   });
-  const [paymentInfo, setPaymentInfo] = useState<CheckoutPaymentInfo>({
-    cardholderName: "",
-    cardNumber: "",
-    expiry: "",
-    cvc: "",
-  });
 
   const updateContactField = (field: keyof CheckoutContactInfo, value: string) => {
     setContactInfo((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const updatePaymentField = (field: keyof CheckoutPaymentInfo, value: string) => {
-    setPaymentInfo((prev) => ({ ...prev, [field]: value }));
   };
 
   const invalidatePayment = () => {
@@ -87,60 +69,24 @@ const CartDrawer = ({
       return "Fyll ut navn, e-post, telefon og adresse for å fullføre kjøpet.";
     }
 
+    if (contactInfo.fullName.trim().length < 2) {
+      return "Navn må være minst 2 tegn.";
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(contactInfo.email.trim())) {
       return "E-postadressen ser ugyldig ut.";
     }
 
-    return null;
-  };
-
-  const validatePaymentInfo = () => {
-    const cardholderName = paymentInfo.cardholderName.trim();
-    const cardDigits = paymentInfo.cardNumber.replace(/\s+/g, "");
-    const expiry = paymentInfo.expiry.trim();
-    const cvc = paymentInfo.cvc.trim();
-
-    if (!cardholderName || !cardDigits || !expiry || !cvc) {
-      return "Fyll ut kortinformasjon før betaling.";
+    if (!/^[\d\s+\-()]{3,20}$/.test(contactInfo.phone.trim())) {
+      return "Telefonnummer ser ugyldig ut.";
     }
 
-    if (!/^\d{12,19}$/.test(cardDigits)) {
-      return "Kortnummer må være mellom 12 og 19 siffer.";
-    }
-
-    if (!/^(0[1-9]|1[0-2])\/(\d{2}|\d{4})$/.test(expiry)) {
-      return "Utløpsdato må være på format MM/YY.";
-    }
-
-    if (!/^\d{3,4}$/.test(cvc)) {
-      return "CVC må være 3 eller 4 siffer.";
+    if (!/^\d{4}$/.test(contactInfo.postalCode.trim())) {
+      return "Postnummer må være 4 siffer.";
     }
 
     return null;
-  };
-
-  const handleProcessPayment = async () => {
-    const paymentValidationError = validatePaymentInfo();
-    if (paymentValidationError) {
-      toast.error("Betaling mangler", {
-        description: paymentValidationError,
-      });
-      return;
-    }
-
-    try {
-      setIsProcessingPayment(true);
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      const reference = `PAY-${Date.now()}`;
-      setPaymentReference(reference);
-      setIsPaymentCompleted(true);
-      toast.success("Betaling godkjent", {
-        description: `Betalingsreferanse: ${reference}`,
-      });
-    } finally {
-      setIsProcessingPayment(false);
-    }
   };
 
   const handleOrder = async () => {
@@ -179,12 +125,6 @@ const CartDrawer = ({
       sendOrderConfirmationEmail(orderSummary);
 
       onClear();
-      setPaymentInfo({
-        cardholderName: "",
-        cardNumber: "",
-        expiry: "",
-        cvc: "",
-      });
       invalidatePayment();
       setContactInfo({
         fullName: "",
@@ -253,11 +193,12 @@ const CartDrawer = ({
                         onRemove(item.id);
                         invalidatePayment();
                       }}
+                      aria-label={`Fjern én ${item.name}`}
                       className="h-7 w-7 rounded-full bg-muted flex items-center justify-center hover:bg-destructive hover:text-destructive-foreground transition-colors"
                     >
                       <Minus className="h-3 w-3" />
                     </button>
-                    <span className="w-6 text-center text-sm font-semibold">
+                    <span className="w-6 text-center text-sm font-semibold" aria-label={`Antall: ${item.quantity}`}>
                       {item.quantity}
                     </span>
                     <button
@@ -265,6 +206,7 @@ const CartDrawer = ({
                         onAdd(item);
                         invalidatePayment();
                       }}
+                      aria-label={`Legg til én ${item.name}`}
                       className="h-7 w-7 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
                     >
                       <Plus className="h-3 w-3" />
@@ -279,33 +221,51 @@ const CartDrawer = ({
                   value={contactInfo.fullName}
                   onChange={(event) => updateContactField("fullName", event.target.value)}
                   placeholder="Fullt navn"
+                  required
+                  minLength={2}
+                  maxLength={100}
                 />
                 <Input
                   value={contactInfo.email}
                   onChange={(event) => updateContactField("email", event.target.value)}
                   placeholder="E-post"
                   type="email"
+                  required
+                  maxLength={254}
                 />
                 <Input
                   value={contactInfo.phone}
                   onChange={(event) => updateContactField("phone", event.target.value)}
-                  placeholder="Telefon"
+                  placeholder="Telefon (f.eks. +47 123 45 678)"
+                  required
+                  inputMode="tel"
+                  maxLength={20}
                 />
                 <Input
                   value={contactInfo.address}
                   onChange={(event) => updateContactField("address", event.target.value)}
                   placeholder="Gateadresse"
+                  required
+                  minLength={2}
+                  maxLength={200}
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     value={contactInfo.postalCode}
                     onChange={(event) => updateContactField("postalCode", event.target.value)}
                     placeholder="Postnr"
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{4}"
+                    maxLength={4}
                   />
                   <Input
                     value={contactInfo.city}
                     onChange={(event) => updateContactField("city", event.target.value)}
                     placeholder="Sted"
+                    required
+                    minLength={1}
+                    maxLength={100}
                   />
                 </div>
                 <Input
@@ -327,60 +287,9 @@ const CartDrawer = ({
                     isPaymentCompleted={isPaymentCompleted}
                   />
                 ) : (
-                  <>
-                    <p className="text-xs text-muted-foreground">
-                      Testmodus: ingen ekte kort blir belastet, men betaling må fullføres før bestilling.
-                    </p>
-                <Input
-                  value={paymentInfo.cardholderName}
-                  onChange={(event) => {
-                    updatePaymentField("cardholderName", event.target.value);
-                    invalidatePayment();
-                  }}
-                  placeholder="Navn på kort"
-                />
-                <Input
-                  value={paymentInfo.cardNumber}
-                  onChange={(event) => {
-                    updatePaymentField("cardNumber", event.target.value);
-                    invalidatePayment();
-                  }}
-                  placeholder="Kortnummer"
-                  inputMode="numeric"
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    value={paymentInfo.expiry}
-                    onChange={(event) => {
-                      updatePaymentField("expiry", event.target.value);
-                      invalidatePayment();
-                    }}
-                    placeholder="MM/YY"
-                  />
-                  <Input
-                    value={paymentInfo.cvc}
-                    onChange={(event) => {
-                      updatePaymentField("cvc", event.target.value);
-                      invalidatePayment();
-                    }}
-                    placeholder="CVC"
-                    inputMode="numeric"
-                  />
-                </div>
-
-                <Button
-                  onClick={handleProcessPayment}
-                  disabled={isProcessingPayment}
-                  className="w-full"
-                  variant={isPaymentCompleted ? "secondary" : "default"}
-                >
-                  {isProcessingPayment
-                    ? "Behandler betaling..."
-                    : isPaymentCompleted
-                      ? "Betaling fullført"
-                      : "Betal nå"}
-                </Button>
-                  </>
+                  <p className="text-sm text-destructive">
+                    Betaling er ikke tilgjengelig. Stripe er ikke konfigurert.
+                  </p>
                 )}
               </div>
             </div>

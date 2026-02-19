@@ -1,8 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useCart } from "@/hooks/useCart";
 
 describe("useCart", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   const mockFood = {
     id: "item-1",
     name: "Gresk Salat",
