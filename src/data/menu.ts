@@ -158,7 +158,7 @@ export const menuItems: FoodItem[] = [
     description: "Dampede soyabønner med havsalt og sesamolje — en lett og sunn snack",
     price: 69,
     category: "Småretter",
-    image: "https://images.unsplash.com/photo-1564834724105-918b73d1b8e0?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?w=400&h=300&fit=crop",
     badge: "Ny",
   },
 ];

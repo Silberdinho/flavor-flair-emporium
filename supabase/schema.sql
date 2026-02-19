@@ -49,7 +49,7 @@ values
   ('Iste med Fersken', 'Avkjølt svart te med fersken, sitron og isbiter', 59, 'Drikke', 'https://images.unsplash.com/photo-1499638673689-79a0b5115d87?w=400&h=300&fit=crop', null),
   ('Espresso Tonic', 'Dobbel espresso over isbiter med premium tonic og appelsinskall', 75, 'Drikke', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=300&fit=crop', null),
   ('Pulled Pork Tacos', 'Tre myke tacos med langtidsstekt svinekjøtt, coleslaw, chipotle-aioli og syltet rødløk', 159, 'Hovedretter', 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=300&fit=crop', 'Ny'),
-  ('Edamame', 'Dampede soyabønner med havsalt og sesamolje — en lett og sunn snack', 69, 'Småretter', 'https://images.unsplash.com/photo-1564834724105-918b73d1b8e0?w=400&h=300&fit=crop', 'Ny')
+  ('Edamame', 'Dampede soyabønner med havsalt og sesamolje — en lett og sunn snack', 69, 'Småretter', 'https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?w=400&h=300&fit=crop', 'Ny')
 on conflict do nothing;
 
 create table if not exists public.orders (

@@ -14,12 +14,19 @@ const About = () => {
       <Navbar cartCount={totalItems} onCartClick={() => setIsOpen(true)} />
 
       {/* Hero banner */}
-      <section className="bg-primary/10 py-16 md:py-24">
-        <div className="container mx-auto px-4 max-w-3xl text-center">
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
+      <section className="relative py-20 md:py-28 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&h=600&fit=crop"
+          alt="Restaurant mat"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-foreground/60" />
+        <div className="relative container mx-auto px-4 max-w-3xl text-center">
+          <h1 className="text-3xl md:text-5xl font-display font-bold text-primary-foreground mb-4">
             Om FreshBite
           </h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+          <p className="text-primary-foreground/80 text-lg max-w-xl mx-auto">
             Vi lager fersk, smakfull mat med lokale råvarer og raske leveringer — hver eneste dag.
           </p>
         </div>
