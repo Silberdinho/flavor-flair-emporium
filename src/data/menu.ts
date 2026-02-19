@@ -1,0 +1,80 @@
+import { FoodItem } from "@/types/food";
+
+export const categories = ["Alle", "Salater", "Hovedretter", "Småretter", "Drikke"];
+
+export const menuItems: FoodItem[] = [
+  {
+    id: "1",
+    name: "Gresk Salat",
+    description: "Friske tomater, agurk, oliven, fetaost og rødløk med oregano-vinaigrette",
+    price: 139,
+    category: "Salater",
+    image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop",
+    badge: "Populær",
+  },
+  {
+    id: "2",
+    name: "Caesar Salat",
+    description: "Crispy romansalat, parmesan, krutonger og hjemmelaget caesar-dressing",
+    price: 149,
+    category: "Salater",
+    image: "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop",
+  },
+  {
+    id: "3",
+    name: "Grillet Laks",
+    description: "Norsk laks med sitronsmør, grønnsaker og potetpuré",
+    price: 269,
+    category: "Hovedretter",
+    image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop",
+    badge: "Anbefalt",
+  },
+  {
+    id: "4",
+    name: "Pasta Bolognese",
+    description: "Hjemmelaget kjøttsaus med fersk pasta og parmesan",
+    price: 189,
+    category: "Hovedretter",
+    image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop",
+  },
+  {
+    id: "5",
+    name: "Kyllingburger",
+    description: "Saftig kyllingfilet med avokado, tomat og aioli i brioche-brød",
+    price: 179,
+    category: "Hovedretter",
+    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
+  },
+  {
+    id: "6",
+    name: "Bruschetta",
+    description: "Ristet surdeigsbrød med tomat, basilikum, hvitløk og olivenolje",
+    price: 89,
+    category: "Småretter",
+    image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400&h=300&fit=crop",
+  },
+  {
+    id: "7",
+    name: "Hummus med Pita",
+    description: "Kremet hummus med varm pitabrød og grønnsaker",
+    price: 99,
+    category: "Småretter",
+    image: "https://images.unsplash.com/photo-1637361973-2b1c4a44b59e?w=400&h=300&fit=crop",
+  },
+  {
+    id: "8",
+    name: "Hjemmelaget Lemonade",
+    description: "Friskpresset sitron med mynte og lett søtning",
+    price: 69,
+    category: "Drikke",
+    image: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=300&fit=crop",
+  },
+  {
+    id: "9",
+    name: "Iste med Fersken",
+    description: "Avkjølt te med fersken og isbiter",
+    price: 59,
+    category: "Drikke",
+    image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop",
+  },
+];
