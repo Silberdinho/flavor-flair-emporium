@@ -102,6 +102,38 @@ do $$ begin
 exception when duplicate_object then null;
 end $$;
 
+-- Format validation (server-side — cannot be bypassed)
+do $$ begin
+  alter table public.orders add constraint chk_customer_name_not_empty
+    check (length(trim(customer_name)) >= 2) not valid;
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_email_format
+    check (customer_email ~* '^[^ @]+@[^ @]+\.[^ @]+$') not valid;
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_phone_format
+    check (customer_phone ~ '^[0-9 +\-()]{3,20}$') not valid;
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_postal_code_format
+    check (customer_postal_code ~ '^[0-9]{4}$') not valid;
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_city_not_empty
+    check (length(trim(customer_city)) >= 1) not valid;
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.orders add constraint chk_customer_address_not_empty
+    check (length(trim(customer_address)) >= 2) not valid;
+exception when duplicate_object then null;
+end $$;
+
 create table if not exists public.order_items (
   id bigserial primary key,
   order_id uuid not null references public.orders(id) on delete cascade,
@@ -116,16 +148,49 @@ create table if not exists public.order_items (
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 
+-- Require payment_reference on every order (blocks fake inserts without payment)
+do $$ begin
+  alter table public.orders add constraint chk_payment_reference_required
+    check (payment_reference is not null and length(trim(payment_reference)) > 0);
+exception when duplicate_object then null;
+end $$;
+
+-- Cap total_price to a reasonable maximum (50 000 kr) to limit abuse
+do $$ begin
+  alter table public.orders add constraint chk_total_price_max check (total_price <= 50000);
+exception when duplicate_object then null;
+end $$;
+
+-- Public (anon) can insert orders only when payment_reference is provided
 drop policy if exists "Public can insert orders" on public.orders;
 create policy "Public can insert orders"
   on public.orders
   for insert
-  with check (true);
+  with check (
+    payment_reference is not null
+    and length(trim(payment_reference)) > 0
+  );
 
+-- Public (anon) can insert order_items only for existing orders
 drop policy if exists "Public can insert order items" on public.order_items;
 create policy "Public can insert order items"
   on public.order_items
   for insert
-  with check (true);
+  with check (
+    order_id in (select id from public.orders)
+  );
+
+-- Admin: authenticated users can read orders (for future admin panel)
+drop policy if exists "Authenticated can read orders" on public.orders;
+create policy "Authenticated can read orders"
+  on public.orders
+  for select
+  using (auth.role() = 'authenticated');
+
+drop policy if exists "Authenticated can read order items" on public.order_items;
+create policy "Authenticated can read order items"
+  on public.order_items
+  for select
+  using (auth.role() = 'authenticated');
 
 select pg_notify('pgrst', 'reload schema');
