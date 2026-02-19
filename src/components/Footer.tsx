@@ -1,32 +1,43 @@
 import { Leaf } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Footer = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleNavigate = (path: string, scrollTo?: string) => {
-    navigate(path);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    if (scrollTo) {
-      setTimeout(() => {
-        document.getElementById(scrollTo)?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+    const isHome = location.pathname === "/";
+
+    if (path === "/" && isHome && scrollTo) {
+      // Already on home — just scroll to the section
+      document.getElementById(scrollTo)?.scrollIntoView({ behavior: "smooth" });
+      return;
     }
+
+    navigate(path);
+    // Wait for page render, then scroll
+    setTimeout(() => {
+      if (scrollTo) {
+        document.getElementById(scrollTo)?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }, 150);
   };
 
   return (
     <footer id="kontakt" className="bg-foreground text-primary-foreground py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-          <div className="flex flex-col items-center md:items-start">
-            <div className="flex items-center gap-2 mb-4">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div>
+            <div className="flex items-center justify-center gap-2 mb-4">
               <Leaf className="h-6 w-6" />
               <span className="font-display text-xl font-bold">FreshBite</span>
             </div>
             <p className="text-primary-foreground/70 text-sm">
               Fersk mat laget med kjærlighet. Vi bruker kun lokale råvarer av høyeste kvalitet.
             </p>
-            <div className="flex gap-4 mt-4">
+            <div className="flex justify-center gap-4 mt-4">
               <button onClick={() => handleNavigate("/", "meny")} className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors bg-transparent border-none cursor-pointer">Meny</button>
               <button onClick={() => handleNavigate("/om-oss")} className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors bg-transparent border-none cursor-pointer">Om oss</button>
             </div>

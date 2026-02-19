@@ -63,7 +63,7 @@ const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
           {filtered.map((item, i) => (
             <div
               key={item.id}
-              className="animate-fade-in-up"
+              className="animate-fade-in-up h-full"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <FoodCard item={item} onAdd={onAddToCart} />
