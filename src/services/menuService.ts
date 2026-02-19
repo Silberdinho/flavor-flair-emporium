@@ -16,5 +16,14 @@ export const getMenuItems = async (): Promise<FoodItem[]> => {
     return fallbackMenuItems;
   }
 
-  return data;
+  // Deduplicate by name — keep the first occurrence of each unique item
+  const seen = new Set<string>();
+  const unique = data.filter((item) => {
+    const key = item.name.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  return unique;
 };

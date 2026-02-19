@@ -1,4 +1,9 @@
 import { Leaf } from "lucide-react";
+import { Link } from "react-router-dom";
+
+const scrollToElement = (id: string) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+};
 
 const Footer = () => {
   return (
@@ -14,8 +19,8 @@ const Footer = () => {
               Fersk mat laget med kjærlighet. Vi bruker kun lokale råvarer av høyeste kvalitet.
             </p>
             <div className="flex gap-4 mt-4">
-              <a href="/#meny" className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors">Meny</a>
-              <a href="/om-oss" className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors">Om oss</a>
+              <button onClick={() => scrollToElement("meny")} className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors bg-transparent border-none cursor-pointer">Meny</button>
+              <Link to="/om-oss" className="text-primary-foreground/70 hover:text-primary-foreground text-sm transition-colors">Om oss</Link>
             </div>
           </div>
 

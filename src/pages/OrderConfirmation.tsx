@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useCartContext } from "@/context/CartContext";
-import { useLocation, Navigate } from "react-router-dom";
+import { useLocation, Navigate, Link } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -78,7 +78,7 @@ const OrderConfirmation = () => {
 
           <div className="mt-6 text-center">
             <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <a href="/#meny">Tilbake til menyen</a>
+              <Link to="/">Tilbake til menyen</Link>
             </Button>
           </div>
         </div>

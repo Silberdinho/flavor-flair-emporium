@@ -19,80 +19,35 @@ create policy "Public can read menu items"
   for select
   using (true);
 
+-- Ensure unique menu item names (prevents duplicates on re-run)
+-- Must truncate BEFORE adding constraint to avoid duplicate key errors
+truncate public.menu_items cascade;
+
+alter table public.menu_items drop constraint if exists menu_items_name_unique;
+alter table public.menu_items add constraint menu_items_name_unique unique (name);
+
 insert into public.menu_items (name, description, price, category, image, badge)
 values
-  (
-    'Gresk Salat',
-    'Friske tomater, agurk, oliven, fetaost og rødløk med oregano-vinaigrette',
-    139,
-    'Salater',
-    'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop',
-    'Populær'
-  ),
-  (
-    'Caesar Salat',
-    'Crispy romansalat, parmesan, krutonger og hjemmelaget caesar-dressing',
-    149,
-    'Salater',
-    'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop',
-    null
-  ),
-  (
-    'Grillet Laks',
-    'Norsk laks med sitronsmør, grønnsaker og potetpuré',
-    269,
-    'Hovedretter',
-    'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop',
-    'Anbefalt'
-  ),
-  (
-    'Pasta Bolognese',
-    'Hjemmelaget kjøttsaus med fersk pasta og parmesan',
-    189,
-    'Hovedretter',
-    'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop',
-    null
-  ),
-  (
-    'Kyllingburger',
-    'Saftig kyllingfilet med avokado, tomat og aioli i brioche-brød',
-    179,
-    'Hovedretter',
-    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
-    null
-  ),
-  (
-    'Bruschetta',
-    'Ristet surdeigsbrød med tomat, basilikum, hvitløk og olivenolje',
-    89,
-    'Småretter',
-    'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400&h=300&fit=crop',
-    null
-  ),
-  (
-    'Hummus med Pita',
-    'Kremet hummus med varm pitabrød og grønnsaker',
-    99,
-    'Småretter',
-    'https://images.unsplash.com/photo-1637361973-2b1c4a44b59e?w=400&h=300&fit=crop',
-    null
-  ),
-  (
-    'Hjemmelaget Lemonade',
-    'Friskpresset sitron med mynte og lett søtning',
-    69,
-    'Drikke',
-    'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=300&fit=crop',
-    null
-  ),
-  (
-    'Iste med Fersken',
-    'Avkjølt te med fersken og isbiter',
-    59,
-    'Drikke',
-    'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
-    null
-  )
+  -- Småretter
+  ('Bruschetta', 'Ristet surdeigsbrød med tomater, basilikum, hvitløk og ekstra virgin olivenolje', 89, 'Småretter', 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=400&h=300&fit=crop', 'Populær'),
+  ('Kyllingvinger', 'Sprøstekte vinger med buffalo-saus og ranch-dip', 119, 'Småretter', 'https://images.unsplash.com/photo-1608039829572-9b0188e45353?w=400&h=300&fit=crop', null),
+  ('Nachos Supreme', 'Sprø tortillachips med smeltet ost, guacamole, salsa og rømme', 109, 'Småretter', 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400&h=300&fit=crop', null),
+  ('Hvitløksreker', 'Scampi stekt i smør med hvitløk, chili og frisk persille', 139, 'Småretter', 'https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?w=400&h=300&fit=crop', null),
+  -- Salater
+  ('Gresk Salat', 'Friske tomater, agurk, oliven, fetaost og rødløk med oregano-vinaigrette', 139, 'Salater', 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop', null),
+  ('Caesar Salat', 'Crispy romansalat, kylling, parmesan, krutonger og hjemmelaget dressing', 149, 'Salater', 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400&h=300&fit=crop', 'Anbefalt'),
+  ('Thai Biff-salat', 'Grillet biff med mango, koriander, peanøtter og søt chilidressing', 169, 'Salater', 'https://images.unsplash.com/photo-1607532941433-304659e8198a?w=400&h=300&fit=crop', null),
+  -- Hovedretter
+  ('Grillet Laks', 'Norsk laks med sitronsmør, dampede grønnsaker og kremet potetpuré', 269, 'Hovedretter', 'https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=400&h=300&fit=crop', 'Anbefalt'),
+  ('Klassisk Burger', 'Angus-burger med cheddar, bacon, løkringer, salat og trøffelaioli', 189, 'Hovedretter', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop', 'Populær'),
+  ('Pasta Carbonara', 'Fersk tagliatelle med pancetta, eggekremer, pecorino og svart pepper', 179, 'Hovedretter', 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&h=300&fit=crop', null),
+  ('Entrecôte', '200 g grillet entrecôte med béarnaisesaus, pommes frites og grønnsaker', 329, 'Hovedretter', 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&h=300&fit=crop', null),
+  ('Kylling Tikka Masala', 'Mør kylling i kremet, krydret tomatsaus med basmatiris og nanbrød', 199, 'Hovedretter', 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop', null),
+  -- Drikke
+  ('Hjemmelaget Lemonade', 'Friskpresset sitron med mynte, agurk og lett søtning', 69, 'Drikke', 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=300&fit=crop', null),
+  ('Mango Smoothie', 'Frisk mango blandet med yoghurt, banan og honning', 79, 'Drikke', 'https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?w=400&h=300&fit=crop', null),
+  ('Iste med Fersken', 'Avkjølt svart te med fersken, sitron og isbiter', 59, 'Drikke', 'https://images.unsplash.com/photo-1499638673689-79a0b5115d87?w=400&h=300&fit=crop', null),
+  ('Espresso Tonic', 'Dobbel espresso over isbiter med premium tonic og appelsinskall', 75, 'Drikke', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=300&fit=crop', null)
 on conflict do nothing;
 
 create table if not exists public.orders (

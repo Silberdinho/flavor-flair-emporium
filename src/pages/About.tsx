@@ -3,6 +3,7 @@ import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useCartContext } from "@/context/CartContext";
+import { Link } from "react-router-dom";
 
 const About = () => {
   const { items, addItem, removeItem, clearCart, totalItems, totalPrice, isOpen, setIsOpen } = useCartContext();
@@ -32,7 +33,7 @@ const About = () => {
 
             <div className="pt-2">
               <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-                <a href="/#meny">Se menyen</a>
+                <Link to="/">Se menyen</Link>
               </Button>
             </div>
           </div>
