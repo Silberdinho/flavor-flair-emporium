@@ -25,3 +25,6 @@ dist-ssr
 
 # Supabase temp files
 supabase/.temp/
+
+# Admin-only files (not for public repo)
+ADMIN_PRE_LAUNCH.md

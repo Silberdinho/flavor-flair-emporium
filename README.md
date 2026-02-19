@@ -135,8 +135,10 @@ Prosjektet bruker Supabase sitt **gratisnivå** (500 MB database, 50 000 request
 ### RLS-policyer (Row Level Security)
 
 - `menu_items` — lesbar for alle (public SELECT)
-- `orders` — skriving tillatt for alle (public INSERT)
-- `order_items` — skriving tillatt for alle (public INSERT)
+- `orders` — skriving tillatt med gyldig `payment_reference` (public INSERT med sjekk)
+- `order_items` — skriving tillatt for eksisterende ordrer (public INSERT med sjekk)
+- `orders` / `order_items` — lesbar for autentiserte brukere (for fremtidig admin-panel)
+- Database-constraints validerer e-postformat, telefon, postnummer (4 siffer) og maks-lengder
 
 ---
 
@@ -164,7 +166,7 @@ Stripe brukes i **testmodus** — ingen ekte penger belastes.
 
 ### Fallback
 
-Hvis Stripe-nøkkelen ikke er satt i `.env.local`, viser appen en **simulert testbetaling** i stedet. Bestillinger lagres uansett, men med `payment_method: "simulated"`.
+Hvis Stripe-nøkkelen ikke er satt i `.env.local`, vises en melding om at betaling ikke er tilgjengelig.
 
 ---
 
@@ -256,8 +258,9 @@ For å teste betaling i Stripe sin testmodus:
 │   ├── data/
 │   │   └── menu.ts          # Lokal fallback-menydata
 │   ├── hooks/
-│   │   └── useCart.ts        # Handlekurv-logikk
+│   │   └── useCart.ts        # Handlekurv-logikk (med localStorage-persistering)
 │   ├── lib/
+│   │   ├── sanitize.ts      # Input-sanitisering (XSS-beskyttelse)
 │   │   ├── supabase.ts      # Supabase-klient
 │   │   └── utils.ts         # Hjelpefunksjoner
 │   ├── pages/
